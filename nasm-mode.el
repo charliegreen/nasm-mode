@@ -46,52 +46,52 @@
   "Indentation level for `nasm-mode'."
   :group 'nasm-mode)
 
-(defface nasm-registers
+(defface nasm-registers-face
   '((t :inherit (font-lock-variable-name-face)))
   "Face for registers."
   :group 'nasm-mode-faces)
 
-(defface nasm-prefix
+(defface nasm-prefix-face
   '((t :inherit (font-lock-builtin-face)))
   "Face for prefix."
   :group 'nasm-mode-faces)
 
-(defface nasm-types
+(defface nasm-types-face
   '((t :inherit (font-lock-type-face)))
   "Face for types."
   :group 'nasm-mode-faces)
 
-(defface nasm-instructions
+(defface nasm-instructions-face
   '((t :inherit (font-lock-builtin-face)))
   "Face for instructions."
   :group 'nasm-mode-faces)
 
-(defface nasm-directives
+(defface nasm-directives-face
   '((t :inherit (font-lock-keyword-face)))
   "Face for directives."
   :group 'nasm-mode-faces)
 
-(defface nasm-preprocessor
+(defface nasm-preprocessor-face
   '((t :inherit (font-lock-preprocessor-face)))
   "Face for preprocessor directives."
   :group 'nasm-mode-faces)
 
-(defface nasm-labels
+(defface nasm-labels-face
   '((t :inherit (font-lock-function-name-face)))
   "Face for nonlocal labels."
   :group 'nasm-mode-faces)
 
-(defface nasm-local-labels
+(defface nasm-local-labels-face
   '((t :inherit (font-lock-function-name-face)))
   "Face for local labels."
   :group 'nasm-mode-faces)
 
-(defface nasm-section-name
+(defface nasm-section-name-face
   '((t :inherit (font-lock-type-face)))
   "Face for section name face."
   :group 'nasm-mode-faces)
 
-(defface nasm-constant
+(defface nasm-constant-face
   '((t :inherit (font-lock-constant-face)))
   "Face for constant."
   :group 'nasm-mode-faces)
@@ -553,17 +553,25 @@
                   "\\s-+\\([a-zA-Z0-9_$#@~.?]+\\)") 2))
   "Expressions for `imenu-generic-expression'.")
 
+;; TODO: figure out why this still isn't matching "rep mov" etc
+(defconst nasm-full-instruction-regexp
+  (let ((pfx (nasm--opt nasm-prefix))
+	(ins (nasm--opt nasm-instructions)))
+    (concat "^\\(" pfx "\\s-+\\)?" ins "$"))
+  "Regexp for `nasm-mode' matching a valid full NASM instruction field,
+including any prefixes or modifiers (eg \"mov\", \"rep mov\", etc match)")
+
 (defconst nasm-font-lock-keywords
-  `((,nasm-section-name-regexp (1 'nasm-section-name))
-    (,(nasm--opt nasm-registers) . 'nasm-registers)
-    (,(nasm--opt nasm-prefix) . 'nasm-prefix)
-    (,(nasm--opt nasm-types) . 'nasm-types)
-    (,(nasm--opt nasm-instructions) . 'nasm-instructions)
-    (,(nasm--opt nasm-directives) . 'nasm-directives)
-    (,(nasm--opt nasm-pp-directives) . 'nasm-preprocessor)
-    (,(concat "^\\s-*" nasm-nonlocal-label-rexexp) (1 'nasm-labels))
-    (,(concat "^\\s-*" nasm-local-label-regexp) (1 'nasm-local-labels))
-    (,nasm-constant-regexp . 'nasm-constant))
+  `((,nasm-section-name-regexp (1 'nasm-section-name-face))
+    (,(nasm--opt nasm-registers) . 'nasm-registers-face)
+    (,(nasm--opt nasm-prefix) . 'nasm-prefix-face)
+    (,(nasm--opt nasm-types) . 'nasm-types-face)
+    (,(nasm--opt nasm-instructions) . 'nasm-instructions-face)
+    (,(nasm--opt nasm-directives) . 'nasm-directives-face)
+    (,(nasm--opt nasm-pp-directives) . 'nasm-preprocessor-face)
+    (,(concat "^\\s-*" nasm-nonlocal-label-rexexp) (1 'nasm-labels-face))
+    (,(concat "^\\s-*" nasm-local-label-regexp) (1 'nasm-local-labels-face))
+    (,nasm-constant-regexp . 'nasm-constant-face))
   "Keywords for `nasm-mode'.")
 
 (defconst nasm-mode-syntax-table
@@ -607,7 +615,8 @@ otherwise, we insert a tab."
 	   (let ((pnt (point))
 		 (bti (progn (back-to-indentation) (point))))
 	     (buffer-substring-no-properties bti pnt)))))
-    (if (member before nasm-instructions)
+    (if (string-match nasm-full-instruction-regexp before)
+	;(member before nasm-instructions)
 	;; We are immediately after an instruction, just insert a tab
 	(insert "\t")
       ;; We're literally anywhere else, indent the whole line
@@ -716,7 +725,7 @@ With a prefix arg, kill the comment on the current line with
   (setf font-lock-defaults '(nasm-font-lock-keywords nil :case-fold)
 	indent-line-function #'nasm-indent-line
 	comment-start ";"
-	imenu-generic-expression nasm-imenu-generic-expression)
+	imenu-generic-expression nasm-imenu-generic-expression))
 
 (provide 'nasm-mode)
 
