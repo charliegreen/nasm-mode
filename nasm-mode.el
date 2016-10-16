@@ -26,9 +26,11 @@
 
 ;; TODO:
 ;; [ ] Line continuation awareness
-;; [ ] Don't run comment command if type ';' inside a string
+;; [x] Don't run comment command if type ';' inside a string
 ;; [ ] Nice multi-; comments, like in asm-mode
 ;; [x] Be able to hit tab after typing mnemonic and insert a TAB
+;; [ ] Autocompletion (of commands and registers)
+;; [ ] Help menu with basic summaries of instructions
 
 ;;; Code:
 
@@ -686,8 +688,8 @@ With a prefix arg, kill the comment on the current line with
   (if (not (eql arg 1))
       (comment-kill nil)
     (cond
-     ;; Empty line? Insert.
-     ((nasm--empty-line-p)
+     ;; Empty line, or inside a string? Insert.
+     ((or (nasm--empty-line-p) (nth 3 (syntax-ppss)))
       (insert ";"))
      ;; Inside the indentation? Comment out the line.
      ((nasm--inside-indentation-p)
