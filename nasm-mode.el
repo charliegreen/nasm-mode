@@ -29,8 +29,13 @@
 ;; [x] Don't run comment command if type ';' inside a string
 ;; [ ] Nice multi-; comments, like in asm-mode
 ;; [x] Be able to hit tab after typing mnemonic and insert a TAB
-;; [ ] Autocompletion (of commands and registers)
+;; [ ] Autocompletion
 ;; [ ] Help menu with basic summaries of instructions
+;; [ ] Highlight errors. Probs easiest would be size mismatches (eg
+;;     "mov al, dword [rbx]")
+;; [ ] Add stuff to work nicely with outline-minor-mode
+;; [x] Set up file associations for .asm and .mac (macro files)
+;; [ ] Highlighting of multiline macro definition arguments
 
 ;;; Code:
 
@@ -728,6 +733,11 @@ With a prefix arg, kill the comment on the current line with
 	indent-line-function #'nasm-indent-line
 	comment-start ";"
 	imenu-generic-expression nasm-imenu-generic-expression))
+
+;;;###autoload
+(progn
+  (add-to-list 'auto-mode-alist '("\\.asm\\'" . nasm-mode))
+  (add-to-list 'auto-mode-alist '("\\.mac\\'" . nasm-mode)))
 
 (provide 'nasm-mode)
 
