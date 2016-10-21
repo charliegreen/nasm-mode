@@ -574,11 +574,11 @@ including any prefixes or modifiers (eg \"mov\", \"rep mov\", etc match)")
     (,(nasm--opt nasm-prefix) . 'nasm-prefix-face)
     (,(nasm--opt nasm-types) . 'nasm-types-face)
     (,(nasm--opt nasm-instructions) . 'nasm-instructions-face)
-    (,(nasm--opt nasm-directives) . 'nasm-directives-face)
     (,(nasm--opt nasm-pp-directives) . 'nasm-preprocessor-face)
     (,(concat "^\\s-*" nasm-nonlocal-label-rexexp) (1 'nasm-labels-face))
     (,(concat "^\\s-*" nasm-local-label-regexp) (1 'nasm-local-labels-face))
-    (,nasm-constant-regexp . 'nasm-constant-face))
+    (,nasm-constant-regexp . 'nasm-constant-face)
+    (,(nasm--opt nasm-directives) . 'nasm-directives-face))
   "Keywords for `nasm-mode'.")
 
 (defconst nasm-mode-syntax-table
